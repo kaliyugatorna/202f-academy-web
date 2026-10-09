@@ -26,5 +26,9 @@ dist-ssr
 .env
 .env.local
 
-# Compiled artifacts — tsc runs with noEmit, these must never be committed
+# Папки сборки
+/dist
+/build
+
+# Скомпилированные JS-файлы из TS/TSX (tsc работает с noEmit, их не должно быть в репозитории)
 src/**/*.js
