@@ -3,8 +3,8 @@ import { persist } from 'zustand/middleware';
 import { Skill, UserSkillProgress } from '../types';
 
 interface SkillState {
-  skills: Map<string, Skill>;
-  userSkillProgress: Map<string, UserSkillProgress>;
+  skills: Record<string, Skill>;
+  userSkillProgress: Record<string, UserSkillProgress>;
   addSkill: (skill: Skill) => void;
   getSkill: (skillId: string) => Skill | undefined;
   updateSkillProgress: (progress: UserSkillProgress) => void;
@@ -14,37 +14,32 @@ interface SkillState {
 
 export const useSkillStore = create<SkillState>()(persist(
   (set, get) => ({
-    skills: new Map(),
-    userSkillProgress: new Map(),
+    skills: {},
+    userSkillProgress: {},
 
     addSkill: (skill: Skill) => {
-      const { skills } = get();
-      skills.set(skill.id, skill);
-      set({ skills });
+      set((state) => ({ skills: { ...state.skills, [skill.id]: skill } }));
     },
 
     getSkill: (skillId: string) => {
-      const { skills } = get();
-      return skills.get(skillId);
+      return get().skills[skillId];
     },
 
     updateSkillProgress: (progress: UserSkillProgress) => {
-      const { userSkillProgress } = get();
       const key = `${progress.userId}-${progress.skillId}`;
-      userSkillProgress.set(key, progress);
-      set({ userSkillProgress });
+      set((state) => ({
+        userSkillProgress: { ...state.userSkillProgress, [key]: progress },
+      }));
     },
 
     getUserSkillProgress: (userId: string) => {
-      const { userSkillProgress } = get();
-      return Array.from(userSkillProgress.values()).filter(
+      return Object.values(get().userSkillProgress).filter(
         (p) => p.userId === userId
       );
     },
 
     getSkillProgress: (userId: string, skillId: string) => {
-      const { userSkillProgress } = get();
-      return userSkillProgress.get(`${userId}-${skillId}`);
+      return get().userSkillProgress[`${userId}-${skillId}`];
     },
   }),
   {

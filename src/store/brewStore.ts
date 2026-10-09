@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { BrewLog } from '../types';
 
+// Dates come back from localStorage as ISO strings — always coerce before use.
+const toTime = (date: Date | string): number => new Date(date).getTime();
+
 interface BrewState {
   brewLogs: BrewLog[];
   addBrewLog: (log: BrewLog) => void;
@@ -23,38 +26,31 @@ export const useBrewStore = create<BrewState>()(persist(
     brewLogs: [],
 
     addBrewLog: (log: BrewLog) => {
-      const { brewLogs } = get();
-      brewLogs.push(log);
-      set({ brewLogs });
+      set((state) => ({ brewLogs: [...state.brewLogs, log] }));
     },
 
     updateBrewLog: (log: BrewLog) => {
-      const { brewLogs } = get();
-      const index = brewLogs.findIndex((b) => b.id === log.id);
-      if (index !== -1) {
-        brewLogs[index] = log;
-        set({ brewLogs });
-      }
+      set((state) => ({
+        brewLogs: state.brewLogs.map((b) => (b.id === log.id ? log : b)),
+      }));
     },
 
     deleteBrewLog: (id: string) => {
-      const { brewLogs } = get();
-      set({ brewLogs: brewLogs.filter((b) => b.id !== id) });
+      set((state) => ({ brewLogs: state.brewLogs.filter((b) => b.id !== id) }));
     },
 
     getUserBrewLogs: (userId: string) => {
-      const { brewLogs } = get();
-      return brewLogs.filter((b) => b.userId === userId).sort((a, b) => b.date.getTime() - a.date.getTime());
+      return get()
+        .brewLogs.filter((b) => b.userId === userId)
+        .sort((a, b) => toTime(b.date) - toTime(a.date));
     },
 
     getBrewLog: (id: string) => {
-      const { brewLogs } = get();
-      return brewLogs.find((b) => b.id === id);
+      return get().brewLogs.find((b) => b.id === id);
     },
 
     getBrewStats: (userId: string) => {
-      const { brewLogs } = get();
-      const userLogs = brewLogs.filter((b) => b.userId === userId);
+      const userLogs = get().brewLogs.filter((b) => b.userId === userId);
 
       if (userLogs.length === 0) {
         return {
@@ -77,9 +73,9 @@ export const useBrewStore = create<BrewState>()(persist(
         {} as Record<string, number>
       );
 
-      const favoriteMethod = Object.entries(methodCounts).sort(
-        ([, a], [, b]) => b - a
-      )[0]?.[0] || null;
+      const favoriteMethod =
+        Object.entries(methodCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+        null;
 
       const logsWithTDS = userLogs.filter((b) => b.tds !== undefined);
       const averageTDS =

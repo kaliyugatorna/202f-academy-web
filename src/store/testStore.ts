@@ -3,8 +3,8 @@ import { persist } from 'zustand/middleware';
 import { Test, TestAttempt, TestQuestion } from '../types';
 
 interface TestState {
-  tests: Map<string, Test>;
-  questions: Map<string, TestQuestion>;
+  tests: Record<string, Test>;
+  questions: Record<string, TestQuestion>;
   testAttempts: TestAttempt[];
   addTest: (test: Test) => void;
   addQuestion: (question: TestQuestion) => void;
@@ -17,46 +17,38 @@ interface TestState {
 
 export const useTestStore = create<TestState>()(persist(
   (set, get) => ({
-    tests: new Map(),
-    questions: new Map(),
+    tests: {},
+    questions: {},
     testAttempts: [],
 
     addTest: (test: Test) => {
-      const { tests } = get();
-      tests.set(test.id, test);
-      set({ tests });
+      set((state) => ({ tests: { ...state.tests, [test.id]: test } }));
     },
 
     addQuestion: (question: TestQuestion) => {
-      const { questions } = get();
-      questions.set(question.id, question);
-      set({ questions });
+      set((state) => ({
+        questions: { ...state.questions, [question.id]: question },
+      }));
     },
 
     getTest: (testId: string) => {
-      const { tests } = get();
-      return tests.get(testId);
+      return get().tests[testId];
     },
 
     getQuestion: (questionId: string) => {
-      const { questions } = get();
-      return questions.get(questionId);
+      return get().questions[questionId];
     },
 
     submitTestAttempt: (attempt: TestAttempt) => {
-      const { testAttempts } = get();
-      testAttempts.push(attempt);
-      set({ testAttempts });
+      set((state) => ({ testAttempts: [...state.testAttempts, attempt] }));
     },
 
     getUserTestAttempts: (userId: string) => {
-      const { testAttempts } = get();
-      return testAttempts.filter((a) => a.userId === userId);
+      return get().testAttempts.filter((a) => a.userId === userId);
     },
 
     getTestAttempt: (attemptId: string) => {
-      const { testAttempts } = get();
-      return testAttempts.find((a) => a.id === attemptId);
+      return get().testAttempts.find((a) => a.id === attemptId);
     },
   }),
   {

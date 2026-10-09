@@ -20,14 +20,11 @@ export const useTrainerStore = create<TrainerState>()(persist(
     },
 
     addMessage: (message: TrainerMessage) => {
-      const { messages } = get();
-      messages.push(message);
-      set({ messages });
+      set((state) => ({ messages: [...state.messages, message] }));
     },
 
     getUserMessages: (userId: string) => {
-      const { messages } = get();
-      return messages.filter((m) => m.userId === userId);
+      return get().messages.filter((m) => m.userId === userId);
     },
   }),
   {
