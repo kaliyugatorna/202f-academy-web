@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Achievement, UserAchievement } from '../types';
 
 interface AchievementState {
-  achievements: Map<string, Achievement>;
+  achievements: Record<string, Achievement>;
   userAchievements: UserAchievement[];
   addAchievement: (achievement: Achievement) => void;
   getAchievement: (id: string) => Achievement | undefined;
@@ -13,32 +13,30 @@ interface AchievementState {
 
 export const useAchievementStore = create<AchievementState>()(persist(
   (set, get) => ({
-    achievements: new Map(),
+    achievements: {},
     userAchievements: [],
 
     addAchievement: (achievement: Achievement) => {
-      const { achievements } = get();
-      achievements.set(achievement.id, achievement);
-      set({ achievements });
+      set((state) => ({
+        achievements: { ...state.achievements, [achievement.id]: achievement },
+      }));
     },
 
     getAchievement: (id: string) => {
-      const { achievements } = get();
-      return achievements.get(id);
+      return get().achievements[id];
     },
 
     unlockAchievement: (userId: string, achievementId: string) => {
-      const { userAchievements } = get();
-      const exists = userAchievements.some(
+      const exists = get().userAchievements.some(
         (ua) => ua.userId === userId && ua.achievementId === achievementId
       );
       if (!exists) {
-        userAchievements.push({
-          userId,
-          achievementId,
-          unlockedAt: new Date(),
-        });
-        set({ userAchievements });
+        set((state) => ({
+          userAchievements: [
+            ...state.userAchievements,
+            { userId, achievementId, unlockedAt: new Date() },
+          ],
+        }));
       }
     },
 
@@ -46,8 +44,8 @@ export const useAchievementStore = create<AchievementState>()(persist(
       const { userAchievements, achievements } = get();
       return userAchievements
         .filter((ua) => ua.userId === userId)
-        .map((ua) => achievements.get(ua.achievementId))
-        .filter((a) => !!a) as Achievement[];
+        .map((ua) => achievements[ua.achievementId])
+        .filter((a): a is Achievement => !!a);
     },
   }),
   {

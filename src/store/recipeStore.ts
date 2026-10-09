@@ -16,34 +16,26 @@ export const useRecipeStore = create<RecipeState>()(persist(
     recipes: [],
 
     addRecipe: (recipe: Recipe) => {
-      const { recipes } = get();
-      recipes.push(recipe);
-      set({ recipes });
+      set((state) => ({ recipes: [...state.recipes, recipe] }));
     },
 
     updateRecipe: (recipe: Recipe) => {
-      const { recipes } = get();
-      const index = recipes.findIndex((r) => r.id === recipe.id);
-      if (index !== -1) {
-        recipes[index] = recipe;
-        set({ recipes });
-      }
+      set((state) => ({
+        recipes: state.recipes.map((r) => (r.id === recipe.id ? recipe : r)),
+      }));
     },
 
     getRecipe: (id: string) => {
-      const { recipes } = get();
-      return recipes.find((r) => r.id === id);
+      return get().recipes.find((r) => r.id === id);
     },
 
     getRecipesByCategory: (category: string) => {
-      const { recipes } = get();
-      return recipes.filter((r) => r.category === category);
+      return get().recipes.filter((r) => r.category === category);
     },
 
     searchRecipes: (query: string) => {
-      const { recipes } = get();
       const q = query.toLowerCase();
-      return recipes.filter(
+      return get().recipes.filter(
         (r) =>
           r.name.toLowerCase().includes(q) ||
           r.description.toLowerCase().includes(q) ||

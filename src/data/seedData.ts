@@ -12,7 +12,7 @@ export const seedData = {
       name: 'Espresso',
       description: 'Espresso extraction, dialing, and troubleshooting',
       category: 'ESPRESSO' as const,
-      icon: '🔫',
+      icon: '⚡',
     },
     {
       id: 'skill-3',
@@ -142,13 +142,13 @@ export const seedData = {
       id: 'ach-3',
       name: 'Espresso Master',
       description: 'Достичь уровня Advanced в Espresso',
-      icon: '🔫',
+      icon: '⚡',
       type: 'SKILL_MASTERY' as const,
       requirement: { type: 'skill_level', value: 5 },
     },
     {
       id: 'ach-4',
-      name: '10 Proливов',
+      name: '10 проливов',
       description: 'Записать 10 проливов в логе',
       icon: '📊',
       type: 'LESSON_MILESTONE' as const,
@@ -164,6 +164,7 @@ export const seedData = {
       category: 'METHODS' as const,
       type: 'ARTICLE' as const,
       duration: 12,
+      createdAt: new Date(),
     },
     {
       id: 'res-2',
@@ -172,6 +173,7 @@ export const seedData = {
       category: 'COFFEE_SCIENCE' as const,
       type: 'VIDEO' as const,
       duration: 18,
+      createdAt: new Date(),
     },
     {
       id: 'res-3',
@@ -180,6 +182,17 @@ export const seedData = {
       category: 'SENSORY' as const,
       type: 'BOOK' as const,
       duration: 45,
+      createdAt: new Date(),
     },
   ],
 };
+
+// Demo progress for the default user ('1') so the dashboard isn't empty on first run
+export const demoSkillProgress = [
+  { userId: '1', skillId: 'skill-2', level: 'PRACTICING' as const, progress: 45, completedLessons: 4, assessmentsPassed: 1, lastUpdated: new Date() },
+  { userId: '1', skillId: 'skill-3', level: 'LEARNING' as const, progress: 30, completedLessons: 2, assessmentsPassed: 0, lastUpdated: new Date() },
+  { userId: '1', skillId: 'skill-4', level: 'LEARNING' as const, progress: 25, completedLessons: 2, assessmentsPassed: 0, lastUpdated: new Date() },
+  { userId: '1', skillId: 'skill-6', level: 'COMPETENT' as const, progress: 65, completedLessons: 6, assessmentsPassed: 2, lastUpdated: new Date() },
+  { userId: '1', skillId: 'skill-5', level: 'LEARNING' as const, progress: 20, completedLessons: 1, assessmentsPassed: 0, lastUpdated: new Date() },
+  { userId: '1', skillId: 'skill-1', level: 'PRACTICING' as const, progress: 50, completedLessons: 5, assessmentsPassed: 1, lastUpdated: new Date() },
+];
