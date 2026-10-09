@@ -25,3 +25,6 @@ dist-ssr
 
 .env
 .env.local
+
+# Compiled artifacts — tsc runs with noEmit, these must never be committed
+src/**/*.js
