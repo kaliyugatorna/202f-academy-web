@@ -31,9 +31,9 @@ const Tests: React.FC = () => {
     if (filter === 'passed') return test.passed === true;
     if (filter === 'failed') return test.passed === false;
     if (filter === 'available') return test.passed === null;
-return true;
-    });
-  
+    return true;
+  });
+
   return (
     <div className={styles.tests}>
       <div className={styles.header}>
@@ -78,7 +78,6 @@ return true;
             <Button
               fullWidth
               variant={test.passed === true ? 'secondary' : 'primary'}
-              disabled={test.passed === true}
             >
               {test.passed === true ? 'Повторить' : 'Начать тест'}
             </Button>
