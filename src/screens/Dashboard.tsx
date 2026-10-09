@@ -2,29 +2,44 @@ import React from 'react';
 import Card from '../components/Card';
 import ProgressBar from '../components/ProgressBar';
 import Badge from '../components/Badge';
+import { useAuthStore } from '../store/authStore';
+import { useSkillStore } from '../store/skillStore';
+import { useBrewStore } from '../store/brewStore';
 import styles from './Dashboard.module.css';
 
-interface DashboardProps {
-}
+const DEMO_USER_ID = '1';
 
-const Dashboard: React.FC<DashboardProps> = ({}) => {
-  const profile = {
-    currentLevel: 'JUNIOR' as const,
-    totalProgress: 31,
-    currentStreak: 7,
-    totalLessonsCompleted: 8,
-    totalTestsPassed: 3,
-    totalBrewLogsRecorded: 15,
-  };
+// Fallback until a real user logs in
+const DEMO_PROFILE = {
+  currentLevel: 'JUNIOR' as const,
+  totalProgress: 31,
+  currentStreak: 7,
+  totalLessonsCompleted: 8,
+  totalTestsPassed: 3,
+  totalBrewLogsRecorded: 15,
+};
 
-  const skills = [
-    { id: '1', name: 'Espresso', level: 'PRACTICING', progress: 45 },
-    { id: '2', name: 'Milk', level: 'LEARNING', progress: 30 },
-    { id: '3', name: 'Filter', level: 'LEARNING', progress: 25 },
-    { id: '4', name: 'Service', level: 'COMPETENT', progress: 65 },
-    { id: '5', name: 'Sensory', level: 'LEARNING', progress: 20 },
-    { id: '6', name: 'Coffee Knowledge', level: 'PRACTICING', progress: 50 },
-  ];
+const Dashboard: React.FC = () => {
+  const authProfile = useAuthStore((s) => s.profile);
+  const skills = useSkillStore((s) => s.skills);
+  const skillProgress = useSkillStore((s) => s.userSkillProgress);
+  const brewLogs = useBrewStore((s) => s.brewLogs);
+
+  const userId = authProfile?.userId ?? DEMO_USER_ID;
+  const profile = authProfile ?? DEMO_PROFILE;
+  const brewLogsRecorded = authProfile
+    ? brewLogs.filter((b) => b.userId === userId).length
+    : DEMO_PROFILE.totalBrewLogsRecorded;
+
+  const skillList = Object.values(skills).map((skill) => {
+    const progress = skillProgress[`${userId}-${skill.id}`];
+    return {
+      id: skill.id,
+      name: skill.name,
+      level: progress?.level ?? 'NOT_STARTED',
+      progress: progress?.progress ?? 0,
+    };
+  });
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -88,7 +103,7 @@ const Dashboard: React.FC<DashboardProps> = ({}) => {
             <span className={styles.statIcon}>☕</span>
             <div>
               <p className={styles.statLabel}>Проливов записано</p>
-              <p className={styles.statValue}>{profile.totalBrewLogsRecorded}</p>
+              <p className={styles.statValue}>{brewLogsRecorded}</p>
             </div>
           </div>
         </Card>
@@ -97,7 +112,7 @@ const Dashboard: React.FC<DashboardProps> = ({}) => {
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Навыки</h3>
         <div className={styles.skillsGrid}>
-          {skills.map((skill) => (
+          {skillList.map((skill) => (
             <Card key={skill.id}>
               <div className={styles.skillCard}>
                 <p className={styles.skillName}>{skill.name}</p>
