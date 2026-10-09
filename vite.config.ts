@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -12,4 +13,11 @@ export default defineConfig({
     sourcemap: false,
     minify: 'terser'
   }
+})
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/academy/202f-academy-web/', //
 })
